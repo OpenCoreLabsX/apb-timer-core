@@ -1,0 +1,5 @@
+theme: jekyll-theme-cayman
+title: APB Timer IP Core
+description: 🚀 High-performance, silicon-proven APB Timer & PWM core for MCU, SoC, and RISC-V systems.
+plugins:
+  - jekyll-seo-tag
