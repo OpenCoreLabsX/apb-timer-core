@@ -53,14 +53,32 @@ APB Timer RTL written in SystemVerilog for MCU, SoC, and RISC-V based systems.
 .
 |-- rtl/        Synthesizable APB Timer RTL
 |-- docs/       GitHub Pages documentation setup
-|-- uvm/        UVM verification testbench environment
+|-- uvm/        UVM verification testbench environment & SVA assertions
 |-- filelist.f  RTL compile filelist
 `-- Makefile    ModelSim UVM run targets
 ```
 
 ## Build & Test
 
+### Verification & SystemVerilog Assertions (SVA)
+
+Cycle-accurate SystemVerilog Assertions (`timer_sva.sv`) are bound to `apb_timer_wrapper` inside `uvm/tb/apb_timer_tb_top.sv` to cover hardware invariants:
+* **Counter Invariants:** Counter stability when disabled (`!timer_en`) and direct register write behavior.
+* **One-Shot Mode:** Hardware clear trigger (`hw_clear_en`) upon overflow/reload.
+* **PWM Output:** Forced low in disabled state (`!pwm_en || !timer_en`) and level comparison during active counting.
+* **IRQ Status:** Unmasked interrupt matching equation (`timer_irq == |(irq_stat & irq_en)`).
+
+### Run Commands
+
 ```sh
-# Run UVM smoke test using ModelSim/Questasim
+# Run static linting and assertion check (Verilator)
+make lint
+
+# Compile RTL and assertion hierarchy
+make compile
+
+# Execute simulation checks
+make run
+
+# Run UVM smoke test (ModelSim / Questasim)
 make run UVM_TEST=apb_timer_smoke_test
-```

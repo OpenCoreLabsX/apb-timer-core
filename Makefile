@@ -34,9 +34,8 @@ check-modelsim:
 	@test -x $(VSIM) || { echo "ERROR: missing $(VSIM). Set MODELSIM_HOME or VSIM."; exit 127; }
 	@test -f $(UVM_SRC)/uvm_pkg.sv || { echo "ERROR: missing $(UVM_SRC)/uvm_pkg.sv. Set UVM_SRC."; exit 127; }
 
-lint: $(RTL_FILELIST)
-	$(VERILATOR_BIN) $(VERILATOR_FLAGS) --lint-only -f $(RTL_FILELIST) --top-module $(TOP_MODULE)
-
+lint:
+	verilator --language 1800-2017 --assert --lint-only -f .rtl_filelist.f --top-module apb_timer_wrapper
 compile: check-modelsim
 	@test -d work || $(VLIB) work
 	$(VLOG) -sv $(UVM_DEFINES) +incdir+$(UVM_SRC) -work work $(UVM_SRC)/uvm_pkg.sv
