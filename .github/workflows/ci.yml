@@ -9,19 +9,17 @@ on:
 jobs:
   lint:
     name: RTL Linting
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install Verilator and dos2unix
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y verilator dos2unix
-
       - name: Run Verilator Lint
-        # Override VERILATOR_BIN and fix Windows CRLF line endings
-        run: |
-          dos2unix filelist.f Makefile
-          make lint VERILATOR_BIN=verilator
+        uses: addnab/docker-run-action@v3
+        with:
+          image: verilator/verilator:latest
+          options: -v ${{ github.workspace }}:/work -w /work
+          run: |
+            grep -v '^uvm/' filelist.f | grep -v '^+incdir+uvm/' > .rtl_filelist.f
+            verilator --language 1800-2017 --lint-only -f .rtl_filelist.f --top-module apb_timer_wrapper
